@@ -6,6 +6,10 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
+from dotenv import load_dotenv
+# load_dotenv()
+
+
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 @app.route('/send-email', methods=['POST'])
@@ -18,15 +22,18 @@ def send_email():
     message_body = data['message']
 
     msg = MIMEText(message_body)
-    msg['Subject'] = "Message from Inheritance App"
+    msg['Subject'] = "Message from Ajogun Net"
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = recipient
 
     try:
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.ehlo()
             server.starttls()
-            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.ehlo()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)  # Use App Password here
             server.sendmail(EMAIL_ADDRESS, recipient, msg.as_string())
+
         return jsonify({"message": f"Email sent successfully to {recipient}"}), 200
     except Exception as e:
         return jsonify({"error": f"Failed to send email: {str(e)}"}), 500
